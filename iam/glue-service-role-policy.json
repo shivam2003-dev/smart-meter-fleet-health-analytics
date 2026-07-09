@@ -1,0 +1,51 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3DataLakeAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": [
+        "arn:aws:s3:::REPLACE_WITH_DATA_LAKE_BUCKET",
+        "arn:aws:s3:::REPLACE_WITH_DATA_LAKE_BUCKET/*"
+      ]
+    },
+    {
+      "Sid": "GlueCatalogAccess",
+      "Effect": "Allow",
+      "Action": [
+        "glue:BatchCreatePartition",
+        "glue:BatchDeletePartition",
+        "glue:BatchGetPartition",
+        "glue:CreatePartition",
+        "glue:CreateTable",
+        "glue:DeletePartition",
+        "glue:GetDatabase",
+        "glue:GetDatabases",
+        "glue:GetPartition",
+        "glue:GetPartitions",
+        "glue:GetTable",
+        "glue:GetTables",
+        "glue:UpdatePartition",
+        "glue:UpdateTable"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudWatchLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "file": "final_dataset/smart_meter_fleet_health.csv",
+  "rows": 50000,
+  "columns": [
+    "meter_id",
+    "timestamp",
+    "voltage",
+    "current",
+    "power_factor",
+    "last_communication_time",
+    "battery_status",
+    "battery_pct",
+    "rssi",
+    "firmware_version",
+    "state",
+    "district",
+    "discom",
+    "feeder_id",
+    "consumption_kwh",
+    "voltage_issue",
+    "power_factor_issue",
+    "comm_issue",
+    "signal_issue",
+    "battery_issue",
+    "health_status"
+  ],
+  "source": "Derived from Hugging Face electricsheepafrica/nigerian_energy_and_utilities_household_smart_meter; missing operational fields were synthetically generated for dashboard prototyping.",
+  "health_status_counts": {
+    "Healthy": 40134,
+    "Warning": 9848,
+    "Critical": 18
+  },
+  "notes": [
+    "Use this as a prototype dataset for Smart Meter Fleet Health Dashboard.",
+    "For production, replace synthetic battery/rssi/firmware/last communication fields with AMI/HES telemetry exports."
+  ]
+}

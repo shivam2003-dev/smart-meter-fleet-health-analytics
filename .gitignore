@@ -1,0 +1,13 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan
+.DS_Store
+__pycache__/
+*.pyc
+*.log
+*.tmp
+*.zip
+*.actual.*
+aws_credentials*
+.env
