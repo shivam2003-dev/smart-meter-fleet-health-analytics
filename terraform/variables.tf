@@ -58,6 +58,12 @@ variable "glue_job_worker_type" {
   default     = "G.1X"
 }
 
+variable "glue_version" {
+  description = "AWS Glue runtime version for the PySpark ETL job."
+  type        = string
+  default     = "5.1"
+}
+
 variable "glue_job_number_of_workers" {
   description = "Number of Glue workers."
   type        = number
@@ -74,4 +80,16 @@ variable "force_destroy_bucket" {
   description = "Allow Terraform to destroy non-empty buckets in non-production environments."
   type        = bool
   default     = false
+}
+
+variable "enable_quicksight_service_role_policy" {
+  description = "Attach S3/Athena/Glue read policy to the existing QuickSight service role so QuickSight can query the data lake."
+  type        = bool
+  default     = true
+}
+
+variable "quicksight_service_role_name" {
+  description = "Existing QuickSight service role name created by QuickSight account subscription."
+  type        = string
+  default     = "aws-quicksight-service-role-v0"
 }

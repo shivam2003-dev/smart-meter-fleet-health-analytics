@@ -73,7 +73,7 @@ resource "aws_glue_crawler" "processed" {
 resource "aws_glue_job" "smart_meter_etl" {
   name              = "${local.name_prefix}-etl"
   role_arn          = aws_iam_role.glue_role.arn
-  glue_version      = "4.0"
+  glue_version      = var.glue_version
   worker_type       = var.glue_job_worker_type
   number_of_workers = var.glue_job_number_of_workers
   timeout           = 30

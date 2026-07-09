@@ -50,25 +50,37 @@ aws glue get-crawler --name "$(terraform output -raw processed_crawler_name)"
 
 Open Athena and run `athena/sql/01_create_views.sql` in the workgroup printed by Terraform.
 
-CLI option:
+Athena `StartQueryExecution` accepts one SQL statement at a time. If using the CLI, split the view file on semicolons and submit each statement separately. Skip the `USE smart_meter_analytics` statement when you pass `--query-execution-context Database=smart_meter_analytics`.
 
 ```bash
-aws athena start-query-execution \
-  --work-group "$(terraform output -raw athena_workgroup)" \
-  --query-string file://../athena/sql/01_create_views.sql
+cd ..
+python3 - <<'PY'
+import pathlib
+
+for statement in pathlib.Path("athena/sql/01_create_views.sql").read_text().split(";"):
+    statement = statement.strip()
+    if statement and not statement.lower().startswith("use "):
+        print(statement + ";\n")
+PY
 ```
 
-If your shell does not expand `file://` content, paste the SQL into the Athena editor.
+Paste each printed statement into Athena, or wrap the same split logic around `aws athena start-query-execution`.
 
 ## QuickSight
 
 Follow `dashboards/quicksight_dashboard_design.md`.
 
-Recommended dataset:
+Live assets created during validation:
 
+- Data source: `smart-meter-athena`
+- Dataset: `smart-meter-fleet-health-dataset`
+- Import mode: `DIRECT_QUERY`
 - Database: `smart_meter_analytics`
 - Table: `smart_meter_fleet_health`
-- Import mode: SPICE
+
+QuickSight requires access to the Athena result bucket. Terraform attaches the `smart-meter-athena-access` inline policy to the existing QuickSight service role `aws-quicksight-service-role-v0`.
+
+The AWS Glue job screen is a PySpark script editor. It does not show a visual ETL graph because this implementation is a scripted, reusable ETL job. Dashboard visuals are built in QuickSight, not in the Glue job editor.
 
 ## Destroy
 

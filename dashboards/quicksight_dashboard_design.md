@@ -4,7 +4,15 @@ Dashboard name: `Smart Meter Fleet Health Executive Dashboard`
 
 Primary dataset: Athena table `smart_meter_analytics.smart_meter_fleet_health`
 
-Recommended import mode: SPICE for dashboard performance. Use direct query only while testing schema changes.
+Live QuickSight data source: `smart-meter-athena`
+
+Live QuickSight dataset: `smart-meter-fleet-health-dataset`
+
+Current import mode: `DIRECT_QUERY`
+
+Recommended production import mode: SPICE for dashboard performance after the schema stabilizes.
+
+Note: AWS Glue will show this as a PySpark script job, not as a visual ETL canvas. Build the visual charts in QuickSight using the dataset above.
 
 ## Filters
 
@@ -99,10 +107,11 @@ Visuals:
 
 ## Publishing Notes
 
-1. In QuickSight, create a new dataset from Athena.
-2. Select workgroup created by Terraform.
-3. Select database `smart_meter_analytics`.
-4. Select table `smart_meter_fleet_health` or the curated Athena views.
-5. Import to SPICE.
-6. Set row-level security later if state or DISCOM-level access separation is required.
-7. Schedule SPICE refresh after the Glue ETL completes.
+1. Open QuickSight in `us-east-1`.
+2. Use dataset `smart-meter-fleet-health-dataset`.
+3. Create a new analysis named `Smart Meter Fleet Health Executive Dashboard`.
+4. Build the sheets and visuals from this document.
+5. Publish the analysis as a dashboard.
+6. For production, switch to SPICE or create a SPICE copy of the dataset after the schema stabilizes.
+7. Set row-level security later if state or DISCOM-level access separation is required.
+8. Schedule SPICE refresh after the Glue ETL completes if you use SPICE.
