@@ -214,6 +214,14 @@ Live dashboard:
 - Published version: `2`
 - Sheets: `Executive Overview`, `Operations Detail`
 
+Executive Overview:
+
+![Smart Meter Executive Overview](docs/executive_overview.png)
+
+Operations Detail:
+
+![Smart Meter Operations Detail](docs/operational_overview.png)
+
 Glue Studio visual companion job:
 
 - Name: `smart-meter-analytics-dev-visual-etl`

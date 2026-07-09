@@ -8,6 +8,16 @@ Published dashboard version: `2`
 
 Primary dataset: Athena table `smart_meter_analytics.smart_meter_fleet_health`
 
+## Current Screenshots
+
+Executive Overview:
+
+![Executive Overview](../docs/executive_overview.png)
+
+Operations Detail:
+
+![Operations Detail](../docs/operational_overview.png)
+
 Live QuickSight data source: `smart-meter-athena`
 
 Live QuickSight dataset: `smart-meter-fleet-health-dataset`
