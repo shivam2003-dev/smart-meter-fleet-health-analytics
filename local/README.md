@@ -89,7 +89,15 @@ The init script registers:
 
 - Superset database: `Smart Meter DuckDB`
 - Datasets: base table plus all analytics views
-- Starter dashboard: `Smart Meter Fleet Health Local Dashboard`
+- Dashboard: `Smart Meter Fleet Health Local Dashboard`
+
+The dashboard is arranged as:
+
+- Row 1: Total, Healthy, Warning, and Critical meter KPI cards.
+- Row 2: Fleet health donut and daily consumption trend.
+- Row 3: State health summary and communication hotspots.
+- Row 4: Issue mix, battery status, and firmware health mix.
+- Row 5: Electrical risk areas and top feeder risk.
 
 DuckDB SQLAlchemy URI for manual Superset setup:
 
@@ -122,17 +130,10 @@ The builder creates:
   - `vw_geographic_health`
   - `vw_firmware_distribution`
   - `vw_top_consumers`
-
-## Superset Dashboard Ideas
-
-Create charts from the DuckDB views:
-
-- KPI cards from `vw_fleet_summary`.
-- Donut chart from `vw_health_by_status`.
-- Daily line chart from `vw_daily_consumption`.
-- State/DISCOM bar charts from `vw_geographic_health`.
-- Firmware bar chart from `vw_firmware_distribution`.
-- Top consumers table from `vw_top_consumers`.
+  - `vw_issue_mix`
+  - `vw_state_health_summary`
+  - `vw_feeder_risk`
+  - `vw_battery_status_summary`
 
 ## Reset
 

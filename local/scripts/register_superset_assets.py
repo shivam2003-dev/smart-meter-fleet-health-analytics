@@ -22,6 +22,10 @@ DATASETS = [
     ("vw_geographic_health", None),
     ("vw_firmware_distribution", None),
     ("vw_top_consumers", "last_seen_at"),
+    ("vw_issue_mix", None),
+    ("vw_state_health_summary", None),
+    ("vw_feeder_risk", None),
+    ("vw_battery_status_summary", None),
 ]
 
 
@@ -48,7 +52,7 @@ def metric(label: str, aggregate: str, column_name: str | None = None) -> dict:
     return result
 
 
-def dashboard_position_json(chart_ids: list[int]) -> str:
+def dashboard_position_json(chart_ids_by_name: dict[str, int]) -> str:
     layout: dict[str, dict] = {
         "DASHBOARD_VERSION_KEY": "v2",
         "ROOT_ID": {
@@ -63,32 +67,58 @@ def dashboard_position_json(chart_ids: list[int]) -> str:
         },
     }
 
-    row: list[str] = []
-    for index, chart_id in enumerate(chart_ids, start=1):
-        chart_key = f"CHART-{chart_id}"
-        layout[chart_key] = {
-            "type": "CHART",
-            "id": chart_key,
-            "children": [],
-            "meta": {
-                "chartId": chart_id,
-                "height": 22 if index == 1 else 36,
-                "width": 4 if index == 1 else 6,
-                "uuid": "",
-            },
-        }
-        row.append(chart_key)
+    rows = [
+        [
+            ("Total Smart Meters", 3, 12),
+            ("Healthy Meters", 3, 12),
+            ("Warning Meters", 3, 12),
+            ("Critical Meters", 3, 12),
+        ],
+        [
+            ("Fleet Health Status", 4, 34),
+            ("Daily Consumption Trend", 8, 34),
+        ],
+        [
+            ("State Health Summary", 6, 34),
+            ("Communication Hotspots", 6, 34),
+        ],
+        [
+            ("Issue Mix", 4, 32),
+            ("Battery Status", 4, 32),
+            ("Firmware Health Mix", 4, 32),
+        ],
+        [
+            ("Electrical Risk Areas", 6, 34),
+            ("Top Feeder Risk", 6, 34),
+        ],
+    ]
 
-        if len(row) == 3 or index == len(chart_ids):
-            row_key = f"ROW-{index}"
-            layout[row_key] = {
-                "type": "ROW",
-                "id": row_key,
-                "children": row,
-                "meta": {"background": "BACKGROUND_TRANSPARENT"},
+    for row_index, row_specs in enumerate(rows, start=1):
+        row_children = []
+        for chart_name, width, height in row_specs:
+            chart_id = chart_ids_by_name[chart_name]
+            chart_key = f"CHART-{chart_id}"
+            layout[chart_key] = {
+                "type": "CHART",
+                "id": chart_key,
+                "children": [],
+                "meta": {
+                    "chartId": chart_id,
+                    "height": height,
+                    "width": width,
+                    "uuid": "",
+                },
             }
-            layout["GRID_ID"]["children"].append(row_key)
-            row = []
+            row_children.append(chart_key)
+
+        row_key = f"ROW-{row_index}"
+        layout[row_key] = {
+            "type": "ROW",
+            "id": row_key,
+            "children": row_children,
+            "meta": {"background": "BACKGROUND_TRANSPARENT"},
+        }
+        layout["GRID_ID"]["children"].append(row_key)
 
     return json.dumps(layout)
 
@@ -177,11 +207,41 @@ def main() -> None:
             (
                 "Total Smart Meters",
                 "big_number_total",
-                "smart_meter_fleet_health",
+                "vw_fleet_summary",
                 {
-                    "metric": metric("Total Smart Meters", "COUNT_DISTINCT", "meter_id"),
+                    "metric": metric("Total", "SUM", "total_meters"),
+                    "header_font_size": 0.38,
+                    "subheader_font_size": 0.12,
+                },
+            ),
+            (
+                "Healthy Meters",
+                "big_number_total",
+                "vw_fleet_summary",
+                {
+                    "metric": metric("Healthy", "SUM", "healthy"),
+                    "header_font_size": 0.38,
+                    "subheader_font_size": 0.12,
+                },
+            ),
+            (
+                "Warning Meters",
+                "big_number_total",
+                "vw_fleet_summary",
+                {
+                    "metric": metric("Warning", "SUM", "warning"),
+                    "header_font_size": 0.38,
+                    "subheader_font_size": 0.12,
+                },
+            ),
+            (
+                "Critical Meters",
+                "big_number_total",
+                "vw_fleet_summary",
+                {
+                    "metric": metric("Critical", "SUM", "critical"),
                     "header_font_size": 0.45,
-                    "subheader_font_size": 0.15,
+                    "subheader_font_size": 0.12,
                 },
             ),
             (
@@ -198,7 +258,7 @@ def main() -> None:
                 },
             ),
             (
-                "Daily Consumption",
+                "Daily Consumption Trend",
                 "echarts_timeseries_line",
                 "vw_daily_consumption",
                 {
@@ -210,18 +270,27 @@ def main() -> None:
                 },
             ),
             (
-                "State-wise Health",
-                "echarts_timeseries_bar",
-                "vw_geographic_health",
+                "State Health Summary",
+                "table",
+                "vw_state_health_summary",
                 {
-                    "groupby": ["state", "health_status"],
-                    "metrics": [metric("Meters", "SUM", "meters")],
-                    "show_legend": True,
-                    "orientation": "vertical",
+                    "query_mode": "aggregate",
+                    "groupby": ["state"],
+                    "metrics": [
+                        metric("Total Meters", "SUM", "total_meters"),
+                        metric("Healthy", "SUM", "healthy"),
+                        metric("Warning", "SUM", "warning"),
+                        metric("Critical", "SUM", "critical"),
+                        metric("Warning %", "AVG", "warning_pct"),
+                        metric("Critical %", "AVG", "critical_pct"),
+                        metric("Avg RSSI", "AVG", "average_rssi"),
+                    ],
+                    "order_desc": True,
+                    "page_length": 10,
                 },
             ),
             (
-                "Communication Health",
+                "Communication Hotspots",
                 "table",
                 "vw_communication_health",
                 {
@@ -237,19 +306,84 @@ def main() -> None:
                 },
             ),
             (
-                "Firmware Distribution",
-                "echarts_timeseries_bar",
+                "Issue Mix",
+                "pie",
+                "vw_issue_mix",
+                {
+                    "groupby": ["issue_type"],
+                    "metric": metric("Issues", "SUM", "issue_count"),
+                    "donut": True,
+                    "show_legend": True,
+                    "legendType": "scroll",
+                    "label_type": "key",
+                },
+            ),
+            (
+                "Battery Status",
+                "pie",
+                "vw_battery_status_summary",
+                {
+                    "groupby": ["battery_status"],
+                    "metric": metric("Meters", "SUM", "meters"),
+                    "donut": True,
+                    "show_legend": True,
+                    "legendType": "scroll",
+                    "label_type": "key",
+                },
+            ),
+            (
+                "Firmware Health Mix",
+                "pie",
                 "vw_firmware_distribution",
                 {
-                    "groupby": ["firmware_version", "health_status"],
-                    "metrics": [metric("Meters", "SUM", "meters")],
+                    "groupby": ["firmware_version"],
+                    "metric": metric("Meters", "SUM", "meters"),
+                    "donut": True,
                     "show_legend": True,
-                    "orientation": "vertical",
+                    "legendType": "scroll",
+                    "label_type": "key",
+                },
+            ),
+            (
+                "Electrical Risk Areas",
+                "table",
+                "vw_electrical_health",
+                {
+                    "query_mode": "aggregate",
+                    "groupby": ["state", "district", "discom"],
+                    "metrics": [
+                        metric("Voltage Violations", "SUM", "voltage_violations"),
+                        metric("Low PF", "SUM", "low_power_factor"),
+                        metric("Avg Voltage", "AVG", "average_voltage"),
+                        metric("Avg Current", "AVG", "average_current"),
+                        metric("Avg PF", "AVG", "average_power_factor"),
+                    ],
+                    "order_desc": True,
+                    "page_length": 15,
+                },
+            ),
+            (
+                "Top Feeder Risk",
+                "table",
+                "vw_feeder_risk",
+                {
+                    "query_mode": "aggregate",
+                    "groupby": ["feeder_id", "state", "district", "discom"],
+                    "metrics": [
+                        metric("Critical", "SUM", "critical_meters"),
+                        metric("Warning", "SUM", "warning_meters"),
+                        metric("Total Issues", "SUM", "total_issues"),
+                        metric("Avg RSSI", "AVG", "average_rssi"),
+                        metric("Total kWh", "SUM", "total_consumption_kwh"),
+                    ],
+                    "order_desc": True,
+                    "page_length": 15,
                 },
             ),
         ]
 
         charts: list[Slice] = []
+        chart_ids_by_name: dict[str, int] = {}
         charts_created = 0
         charts_updated = 0
         for name, viz_type, dataset_name, params_extra in chart_specs:
@@ -272,6 +406,8 @@ def main() -> None:
             chart.query_context = None
             db.session.add(chart)
             charts.append(chart)
+            db.session.flush()
+            chart_ids_by_name[name] = chart.id
 
         db.session.commit()
 
@@ -285,7 +421,7 @@ def main() -> None:
 
         dashboard.published = True
         dashboard.slices = charts
-        dashboard.position_json = dashboard_position_json([chart.id for chart in charts])
+        dashboard.position_json = dashboard_position_json(chart_ids_by_name)
         dashboard.json_metadata = json.dumps(
             {
                 "timed_refresh_immune_slices": [],

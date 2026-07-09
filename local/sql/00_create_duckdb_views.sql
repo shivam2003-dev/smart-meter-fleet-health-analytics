@@ -119,3 +119,58 @@ SELECT
   MAX(timestamp) AS last_seen_at
 FROM smart_meter_fleet_health
 GROUP BY meter_id, state, district, discom, feeder_id;
+
+CREATE OR REPLACE VIEW vw_issue_mix AS
+SELECT 'Voltage Issues' AS issue_type, SUM(CASE WHEN voltage_issue THEN 1 ELSE 0 END) AS issue_count
+FROM smart_meter_fleet_health
+UNION ALL
+SELECT 'Power Factor Issues' AS issue_type, SUM(CASE WHEN power_factor_issue THEN 1 ELSE 0 END) AS issue_count
+FROM smart_meter_fleet_health
+UNION ALL
+SELECT 'Communication Issues' AS issue_type, SUM(CASE WHEN comm_issue THEN 1 ELSE 0 END) AS issue_count
+FROM smart_meter_fleet_health
+UNION ALL
+SELECT 'Signal Issues' AS issue_type, SUM(CASE WHEN signal_issue THEN 1 ELSE 0 END) AS issue_count
+FROM smart_meter_fleet_health
+UNION ALL
+SELECT 'Battery Issues' AS issue_type, SUM(CASE WHEN battery_issue THEN 1 ELSE 0 END) AS issue_count
+FROM smart_meter_fleet_health;
+
+CREATE OR REPLACE VIEW vw_state_health_summary AS
+SELECT
+  state,
+  COUNT(DISTINCT meter_id) AS total_meters,
+  SUM(CASE WHEN health_status = 'Healthy' THEN 1 ELSE 0 END) AS healthy,
+  SUM(CASE WHEN health_status = 'Warning' THEN 1 ELSE 0 END) AS warning,
+  SUM(CASE WHEN health_status = 'Critical' THEN 1 ELSE 0 END) AS critical,
+  ROUND(100.0 * SUM(CASE WHEN health_status = 'Warning' THEN 1 ELSE 0 END) / COUNT(*), 2) AS warning_pct,
+  ROUND(100.0 * SUM(CASE WHEN health_status = 'Critical' THEN 1 ELSE 0 END) / COUNT(*), 2) AS critical_pct,
+  ROUND(AVG(rssi), 2) AS average_rssi,
+  ROUND(AVG(battery_pct), 2) AS average_battery_pct
+FROM smart_meter_fleet_health
+GROUP BY state;
+
+CREATE OR REPLACE VIEW vw_feeder_risk AS
+SELECT
+  feeder_id,
+  state,
+  district,
+  discom,
+  COUNT(DISTINCT meter_id) AS meters,
+  SUM(CASE WHEN health_status = 'Critical' THEN 1 ELSE 0 END) AS critical_meters,
+  SUM(CASE WHEN health_status = 'Warning' THEN 1 ELSE 0 END) AS warning_meters,
+  SUM(issue_count) AS total_issues,
+  ROUND(AVG(rssi), 2) AS average_rssi,
+  ROUND(AVG(voltage), 2) AS average_voltage,
+  ROUND(SUM(consumption_kwh), 2) AS total_consumption_kwh
+FROM smart_meter_fleet_health
+GROUP BY feeder_id, state, district, discom;
+
+CREATE OR REPLACE VIEW vw_battery_status_summary AS
+SELECT
+  battery_status,
+  COUNT(DISTINCT meter_id) AS meters,
+  ROUND(AVG(battery_pct), 2) AS average_battery_pct,
+  SUM(CASE WHEN battery_issue THEN 1 ELSE 0 END) AS low_battery_devices
+FROM smart_meter_fleet_health
+GROUP BY battery_status;

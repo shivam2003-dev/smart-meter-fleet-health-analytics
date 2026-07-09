@@ -18,6 +18,10 @@ REQUIRED_VIEWS = [
     "vw_geographic_health",
     "vw_firmware_distribution",
     "vw_top_consumers",
+    "vw_issue_mix",
+    "vw_state_health_summary",
+    "vw_feeder_risk",
+    "vw_battery_status_summary",
 ]
 
 
