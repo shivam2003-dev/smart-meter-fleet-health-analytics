@@ -4,30 +4,71 @@ Production-oriented serverless analytics platform for smart meter fleet health m
 
 ## Architecture
 
-```text
-CSV Dataset
-  |
-  v
-Amazon S3 raw zone
-  |
-  v
-AWS Glue Crawler
-  |
-  v
-Glue Data Catalog
-  |
-  v
-AWS Glue ETL PySpark Job
-  |
-  v
-Amazon S3 processed zone, Parquet + Snappy, partitioned by year/month/day
-  |
-  v
-Amazon Athena Workgroup + optimized views
-  |
-  v
-Amazon QuickSight Executive Dashboard
+```mermaid
+flowchart TD
+  user["Utility Ops / Analytics Users"]
+  csv["Smart Meter CSV Dataset<br/>final_dataset/smart_meter_fleet_health.csv"]
+
+  subgraph s3["Amazon S3 Data Lake<br/>smart-meter-analytics-dev-*"]
+    raw["raw/<br/>CSV landing zone"]
+    processed["processed/<br/>Parquet + Snappy<br/>partitioned by year/month/day"]
+    athena_results["athena-results/<br/>query output"]
+    scripts["scripts/<br/>Glue ETL + Athena SQL"]
+    logs["logs/<br/>Spark UI / operational logs"]
+  end
+
+  subgraph glue["AWS Glue"]
+    raw_crawler["Raw Crawler<br/>smart-meter-analytics-dev-raw-crawler"]
+    catalog["Glue Data Catalog<br/>smart_meter_analytics"]
+    etl["Glue ETL PySpark Job<br/>smart-meter-analytics-dev-etl<br/>Glue 5.1"]
+    processed_crawler["Processed Crawler<br/>smart-meter-analytics-dev-processed-crawler"]
+  end
+
+  subgraph query["Amazon Athena"]
+    workgroup["Athena Workgroup<br/>smart-meter-analytics-dev-wg"]
+    views["Curated SQL Views<br/>fleet, comms, electrical,<br/>battery, consumption, geography, firmware"]
+  end
+
+  subgraph bi["Amazon QuickSight"]
+    datasource["Athena Data Source<br/>smart-meter-athena"]
+    dataset["Dataset<br/>smart-meter-fleet-health-dataset"]
+    dashboard["Dashboard<br/>Smart Meter Fleet Health Executive Dashboard"]
+  end
+
+  subgraph ops["Security and Operations"]
+    iam["IAM Roles and Policies<br/>Glue role + QuickSight Athena access"]
+    cw["CloudWatch Log Groups<br/>Glue, crawlers, Athena"]
+  end
+
+  csv --> raw
+  raw --> raw_crawler --> catalog
+  catalog --> etl
+  raw --> etl
+  scripts --> etl
+  etl --> processed
+  etl --> logs
+  processed --> processed_crawler --> catalog
+  catalog --> workgroup
+  processed --> workgroup
+  workgroup --> athena_results
+  workgroup --> views
+  views --> datasource
+  datasource --> dataset --> dashboard --> user
+  iam -.-> glue
+  iam -.-> query
+  iam -.-> bi
+  cw -.-> glue
+  cw -.-> query
 ```
+
+### Data Flow
+
+1. The CSV lands in the S3 raw zone.
+2. The raw Glue crawler catalogs the CSV schema.
+3. The Glue 5.1 PySpark ETL job reads raw CSV, normalizes data, removes duplicates, converts timestamps, recomputes health fields, and writes Snappy Parquet.
+4. The processed crawler catalogs Parquet partitions by `year/month/day`.
+5. Athena queries the processed table and curated views.
+6. QuickSight connects to Athena through `smart-meter-athena`, uses dataset `smart-meter-fleet-health-dataset`, and publishes the executive dashboard.
 
 ## Repository Layout
 
