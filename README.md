@@ -219,7 +219,7 @@ Glue Studio visual companion job:
 - Name: `smart-meter-analytics-dev-visual-etl`
 - Mode: `VISUAL`
 - Runtime: Glue `5.1`
-- Nodes: raw CSV source -> schema mapping -> Parquet preview target
+- Nodes: raw Glue Catalog table -> schema mapping -> Parquet preview target
 
 Top KPI cards:
 

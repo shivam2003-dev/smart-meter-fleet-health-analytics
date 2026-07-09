@@ -99,10 +99,12 @@ smart-meter-analytics-dev-visual-etl
 Open AWS Glue > ETL jobs > Visual ETL and search for that job. It shows:
 
 ```text
-Raw Smart Meter CSV
+Raw Smart Meter Catalog Table
   -> Apply Smart Meter Schema
   -> Parquet Visual Preview Target
 ```
+
+The source node uses Glue Catalog table `smart_meter_analytics.raw_raw`. This is intentional: Glue Studio previews are more reliable from a catalog table than from a direct S3 file URL because the crawler has already supplied schema metadata.
 
 The visual job is for inspection and demonstration. The production analytics pipeline uses the PySpark job because it contains the full cleaning, partitioning, deduplication, health-status recomputation, and catalog update logic.
 

@@ -358,10 +358,19 @@ Visual nodes: 3
 The visual DAG is:
 
 ```text
-Raw Smart Meter CSV
+Raw Smart Meter Catalog Table
   -> Apply Smart Meter Schema
   -> Parquet Visual Preview Target
 ```
+
+The source node uses:
+
+```text
+Glue Catalog database: smart_meter_analytics
+Glue Catalog table: raw_raw
+```
+
+I changed the source from a direct S3 CSV URL to this catalog table after Glue Studio showed the source node as misconfigured. The catalog source gives Glue Studio the crawler-generated schema and is better for preview.
 
 This visual job is for Glue Studio visual inspection. The production analytics ETL remains:
 

@@ -222,10 +222,18 @@ This job is visible in AWS Glue Studio Visual ETL. It is not the main production
 Current visual nodes:
 
 ```text
-Raw Smart Meter CSV
+Raw Smart Meter Catalog Table
   -> Apply Smart Meter Schema
   -> Parquet Visual Preview Target
 ```
+
+The visual job source uses the Glue Catalog table:
+
+```text
+smart_meter_analytics.raw_raw
+```
+
+This avoids direct S3 source preview problems in Glue Studio because the raw crawler already registered the schema.
 
 Why this is separate:
 
@@ -579,7 +587,7 @@ smart-meter-analytics-dev-visual-etl
 You should see:
 
 ```text
-Raw Smart Meter CSV
+Raw Smart Meter Catalog Table
   -> Apply Smart Meter Schema
   -> Parquet Visual Preview Target
 ```
