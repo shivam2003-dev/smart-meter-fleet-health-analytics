@@ -4,6 +4,8 @@ Dashboard name: `Smart Meter Fleet Health Executive Dashboard`
 
 Live dashboard ID: `smart-meter-fleet-health-executive-dashboard`
 
+Published dashboard version: `2`
+
 Primary dataset: Athena table `smart_meter_analytics.smart_meter_fleet_health`
 
 Live QuickSight data source: `smart-meter-athena`
@@ -34,16 +36,35 @@ Create these calculated fields in QuickSight if they are not imported from Athen
 - `Low Battery Flag`: `ifelse({battery_status} = 'Low', 1, 0)`
 - `Signal Quality`: `ifelse({rssi} < -90, 'Poor', {rssi} < -80, 'Weak', 'Good')`
 
-## Sheet 1: Executive Overview
+## Deployed Sheet 1: Executive Overview
 
 Created initial dashboard visuals:
 
 - Total Smart Meters KPI
+- Average Voltage KPI
+- Average RSSI KPI
+- Average Battery % KPI
+- Average kWh KPI
 - Fleet Health Status donut
 - State-wise Health stacked bar
+- Consumption by DISCOM bar
+- Battery Status bar
 - Fleet Summary table
 
-KPI cards:
+## Deployed Sheet 2: Operations Detail
+
+Created operations visuals:
+
+- Firmware Distribution
+- District Health
+- Average Voltage by State
+- Average RSSI by DISCOM
+- Consumption by Feeder
+- Device Detail table
+
+## Future Expansion Ideas
+
+Additional KPI cards:
 
 - Total Smart Meters: distinct count of `meter_id`
 - Healthy: distinct count where `health_status = Healthy`
@@ -54,13 +75,13 @@ KPI cards:
 - Average Battery %: average `battery_pct`
 - Average Consumption: average `consumption_kwh`
 
-Visuals:
+Additional overview visuals:
 
 - Health Status Donut: `health_status` by distinct count `meter_id`
 - Meter Health Trend: `event_date` by distinct count `meter_id`, grouped by `health_status`
 - Fleet Summary Table: `state`, `district`, `discom`, distinct meters, average voltage, average RSSI, average battery, warning count, critical count
 
-## Sheet 2: Geography
+### Geography
 
 Visuals:
 
@@ -69,7 +90,7 @@ Visuals:
 - DISCOM Comparison: clustered bar, `discom` by healthy/warning/critical meters
 - Map visual: state or district if geocoding is enabled in the account
 
-## Sheet 3: Communication
+### Communication
 
 Visuals:
 
@@ -78,7 +99,7 @@ Visuals:
 - Signal Quality Histogram: calculated `Signal Quality`
 - Worst RSSI Table: `meter_id`, `state`, `district`, `discom`, `rssi`, `last_communication_time`, `health_status`
 
-## Sheet 4: Electrical
+### Electrical
 
 Visuals:
 
@@ -88,7 +109,7 @@ Visuals:
 - Current Distribution: histogram of `current`
 - Electrical Health Table: `meter_id`, `voltage`, `current`, `power_factor`, issue flags
 
-## Sheet 5: Battery
+### Battery
 
 Visuals:
 
@@ -97,7 +118,7 @@ Visuals:
 - Low Battery Devices: table filtered to `battery_issue = true`
 - Battery by Firmware: `firmware_version` by average `battery_pct`
 
-## Sheet 6: Consumption
+### Consumption
 
 Visuals:
 
@@ -106,7 +127,7 @@ Visuals:
 - Top Feeders: bar `feeder_id` by sum `consumption_kwh`, top 20
 - Top Districts: bar `district` by sum `consumption_kwh`
 
-## Sheet 7: Firmware
+### Firmware
 
 Visuals:
 

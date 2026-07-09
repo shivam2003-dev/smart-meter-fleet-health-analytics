@@ -77,10 +77,36 @@ Live assets created during validation:
 - Import mode: `DIRECT_QUERY`
 - Database: `smart_meter_analytics`
 - Table: `smart_meter_fleet_health`
+- Dashboard: `Smart Meter Fleet Health Executive Dashboard`
+- Published dashboard version: `2`
 
 QuickSight requires access to the Athena result bucket. Terraform attaches the `smart-meter-athena-access` inline policy to the existing QuickSight service role `aws-quicksight-service-role-v0`.
 
-The AWS Glue job screen is a PySpark script editor. It does not show a visual ETL graph because this implementation is a scripted, reusable ETL job. Dashboard visuals are built in QuickSight, not in the Glue job editor.
+## Glue Studio Visual ETL
+
+The production AWS Glue job is a PySpark script job:
+
+```text
+smart-meter-analytics-dev-etl
+```
+
+There is also a visual companion job for Glue Studio:
+
+```text
+smart-meter-analytics-dev-visual-etl
+```
+
+Open AWS Glue > ETL jobs > Visual ETL and search for that job. It shows:
+
+```text
+Raw Smart Meter CSV
+  -> Apply Smart Meter Schema
+  -> Parquet Visual Preview Target
+```
+
+The visual job is for inspection and demonstration. The production analytics pipeline uses the PySpark job because it contains the full cleaning, partitioning, deduplication, health-status recomputation, and catalog update logic.
+
+Dashboard visuals are built in QuickSight, not in the Glue job editor.
 
 ## Destroy
 

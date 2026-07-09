@@ -299,28 +299,79 @@ I created the actual QuickSight dashboard:
 Dashboard name: Smart Meter Fleet Health Executive Dashboard
 Dashboard ID: smart-meter-fleet-health-executive-dashboard
 Dashboard ARN: arn:aws:quicksight:us-east-1:469863270891:dashboard/smart-meter-fleet-health-executive-dashboard
-Version: 1
+Published version: 2
 Status: CREATION_SUCCESSFUL
 ```
 
-The initial published dashboard contains:
+The compact published dashboard contains two sheets:
+
+```text
+Executive Overview
+Operations Detail
+```
+
+Executive Overview contains:
 
 ```text
 Total Smart Meters KPI
+Average Voltage KPI
+Average RSSI KPI
+Average Battery % KPI
+Average kWh KPI
 Fleet Health Status donut
 State-wise Health stacked bar
+Consumption by DISCOM bar
+Battery Status bar
 Fleet Summary table
 ```
 
-To expand the visual dashboard further in QuickSight, use the existing dataset and follow:
+Operations Detail contains:
+
+```text
+Firmware Distribution
+District Health
+Average Voltage by State
+Average RSSI by DISCOM
+Consumption by Feeder
+Device Detail table
+```
+
+For dashboard design notes, use:
 
 ```text
 dashboards/quicksight_dashboard_design.md
 ```
 
-Important: the AWS Glue job page is a script editor for this PySpark ETL job. It will not show dashboard charts or a Glue visual ETL graph. The visual dashboard belongs in QuickSight.
+Important: the production AWS Glue job page is a script editor for the PySpark ETL job. It will not show dashboard charts. The dashboard charts belong in QuickSight.
 
-## 10. Glue Version Update
+## 10. Glue Studio Visual ETL Job
+
+I created a separate Glue Studio visual companion job:
+
+```text
+Job name: smart-meter-analytics-dev-visual-etl
+Job mode: VISUAL
+Glue version: 5.1
+Visual nodes: 3
+```
+
+The visual DAG is:
+
+```text
+Raw Smart Meter CSV
+  -> Apply Smart Meter Schema
+  -> Parquet Visual Preview Target
+```
+
+This visual job is for Glue Studio visual inspection. The production analytics ETL remains:
+
+```text
+smart-meter-analytics-dev-etl
+```
+
+I kept them separate so the validated production PySpark job stays stable while Glue Studio still shows a visual flow.
+
+## 11. Glue Version Update
 
 I updated the Glue runtime from `4.0` to `5.1` through Terraform:
 

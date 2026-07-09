@@ -101,6 +101,7 @@ dashboards/
 
 docs/
   deployment_guide.md
+  smart_meter_platform_explained.md
 
 iam/
   glue-service-role-policy.json
@@ -156,6 +157,9 @@ The Glue job:
 
 See [docs/deployment_guide.md](docs/deployment_guide.md).
 
+For a beginner-to-advanced explanation of how the system works, read
+[docs/smart_meter_platform_explained.md](docs/smart_meter_platform_explained.md).
+
 Short version:
 
 ```bash
@@ -202,6 +206,20 @@ These support:
 ## QuickSight Dashboard
 
 Dashboard spec is in [dashboards/quicksight_dashboard_design.md](dashboards/quicksight_dashboard_design.md).
+
+Live dashboard:
+
+- Name: `Smart Meter Fleet Health Executive Dashboard`
+- ID: `smart-meter-fleet-health-executive-dashboard`
+- Published version: `2`
+- Sheets: `Executive Overview`, `Operations Detail`
+
+Glue Studio visual companion job:
+
+- Name: `smart-meter-analytics-dev-visual-etl`
+- Mode: `VISUAL`
+- Runtime: Glue `5.1`
+- Nodes: raw CSV source -> schema mapping -> Parquet preview target
 
 Top KPI cards:
 
