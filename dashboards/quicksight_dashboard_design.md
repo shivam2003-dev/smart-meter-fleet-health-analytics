@@ -2,6 +2,8 @@
 
 Dashboard name: `Smart Meter Fleet Health Executive Dashboard`
 
+Live dashboard ID: `smart-meter-fleet-health-executive-dashboard`
+
 Primary dataset: Athena table `smart_meter_analytics.smart_meter_fleet_health`
 
 Live QuickSight data source: `smart-meter-athena`
@@ -33,6 +35,13 @@ Create these calculated fields in QuickSight if they are not imported from Athen
 - `Signal Quality`: `ifelse({rssi} < -90, 'Poor', {rssi} < -80, 'Weak', 'Good')`
 
 ## Sheet 1: Executive Overview
+
+Created initial dashboard visuals:
+
+- Total Smart Meters KPI
+- Fleet Health Status donut
+- State-wise Health stacked bar
+- Fleet Summary table
 
 KPI cards:
 

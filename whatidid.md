@@ -293,7 +293,26 @@ Output columns: 27
 Source table: smart_meter_analytics.smart_meter_fleet_health
 ```
 
-To build the visual dashboard in QuickSight, use the existing dataset and follow:
+I created the actual QuickSight dashboard:
+
+```text
+Dashboard name: Smart Meter Fleet Health Executive Dashboard
+Dashboard ID: smart-meter-fleet-health-executive-dashboard
+Dashboard ARN: arn:aws:quicksight:us-east-1:469863270891:dashboard/smart-meter-fleet-health-executive-dashboard
+Version: 1
+Status: CREATION_SUCCESSFUL
+```
+
+The initial published dashboard contains:
+
+```text
+Total Smart Meters KPI
+Fleet Health Status donut
+State-wise Health stacked bar
+Fleet Summary table
+```
+
+To expand the visual dashboard further in QuickSight, use the existing dataset and follow:
 
 ```text
 dashboards/quicksight_dashboard_design.md
