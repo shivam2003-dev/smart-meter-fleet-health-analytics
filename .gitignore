@@ -11,3 +11,9 @@ __pycache__/
 *.actual.*
 aws_credentials*
 .env
+local/.venv/
+local/superset_home/
+local/duckdb/*.duckdb
+local/duckdb/*.wal
+local/logs/
+local/notebooks/.ipynb_checkpoints/

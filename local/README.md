@@ -1,0 +1,142 @@
+# Local Smart Meter Analytics Stack
+
+This folder runs the smart meter analytics workflow on your laptop.
+
+It uses:
+
+- DuckDB for local SQL over CSV/Parquet.
+- Jupyter Notebook for exploration and explanation.
+- Apache Superset for local BI dashboards.
+
+No AWS resources are required for this local path. Superset and Jupyter are local web apps, so they run on your laptop ports, not in the cloud.
+
+## Folder Layout
+
+```text
+local/
+  data/
+    smart_meter_fleet_health.csv
+    smart_meter_fleet_health.parquet
+  duckdb/
+    smart_meter.duckdb
+  notebooks/
+    smart_meter_fleet_health_local.ipynb
+  scripts/
+    build_duckdb.py
+    validate_local_stack.py
+    register_superset_assets.py
+    init_superset.sh
+    run_jupyter.sh
+    run_superset.sh
+  sql/
+    00_create_duckdb_views.sql
+  superset/
+    superset_config.py
+  superset_home/
+```
+
+## Quick Start
+
+From the repo root:
+
+```bash
+cd local
+uv venv --python 3.12 .venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+
+python scripts/build_duckdb.py
+python scripts/validate_local_stack.py
+```
+
+## Open Jupyter
+
+```bash
+cd local
+source .venv/bin/activate
+./scripts/run_jupyter.sh
+```
+
+Open the notebook:
+
+```text
+notebooks/smart_meter_fleet_health_local.ipynb
+```
+
+## Open Superset
+
+```bash
+cd local
+source .venv/bin/activate
+./scripts/init_superset.sh
+./scripts/run_superset.sh
+```
+
+Open:
+
+```text
+http://localhost:8088
+```
+
+Default local login:
+
+```text
+username: admin
+password: admin
+```
+
+The init script registers:
+
+- Superset database: `Smart Meter DuckDB`
+- Datasets: base table plus all analytics views
+- Starter dashboard: `Smart Meter Fleet Health Local Dashboard`
+
+DuckDB SQLAlchemy URI for manual Superset setup:
+
+```text
+duckdb:///local/duckdb/smart_meter.duckdb
+```
+
+If Superset asks for an absolute path, use:
+
+```bash
+python - <<'PY'
+from pathlib import Path
+print("duckdb:///" + str(Path("duckdb/smart_meter.duckdb").resolve()))
+PY
+```
+
+## What DuckDB Creates
+
+The builder creates:
+
+- Table: `smart_meter_fleet_health`
+- Views:
+  - `vw_fleet_summary`
+  - `vw_health_by_status`
+  - `vw_communication_health`
+  - `vw_electrical_health`
+  - `vw_battery_health`
+  - `vw_daily_consumption`
+  - `vw_monthly_consumption`
+  - `vw_geographic_health`
+  - `vw_firmware_distribution`
+  - `vw_top_consumers`
+
+## Superset Dashboard Ideas
+
+Create charts from the DuckDB views:
+
+- KPI cards from `vw_fleet_summary`.
+- Donut chart from `vw_health_by_status`.
+- Daily line chart from `vw_daily_consumption`.
+- State/DISCOM bar charts from `vw_geographic_health`.
+- Firmware bar chart from `vw_firmware_distribution`.
+- Top consumers table from `vw_top_consumers`.
+
+## Reset
+
+```bash
+rm -f duckdb/smart_meter.duckdb
+python scripts/build_duckdb.py
+```

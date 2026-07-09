@@ -78,6 +78,9 @@ final_dataset/
   smart_meter_fleet_health.parquet
   validation_report.json
 
+local/
+  Laptop-only DuckDB, Jupyter, and Superset workflow
+
 terraform/
   S3, Glue, IAM, Athena, CloudWatch infrastructure
 
@@ -178,6 +181,18 @@ aws glue start-crawler --name "$(terraform output -raw processed_crawler_name)"
 ```
 
 Run `athena/sql/01_create_views.sql` after processed data is cataloged.
+
+## Laptop-Only Local Stack
+
+The `local/` folder runs the same smart meter use case without AWS:
+
+```text
+CSV / Parquet -> DuckDB -> Jupyter Notebook -> Apache Superset
+```
+
+Start from [local/README.md](local/README.md). It builds a local DuckDB database,
+executes the tutorial notebook, initializes Superset, and registers the DuckDB
+datasets for local dashboarding.
 
 ## Athena Analytics
 

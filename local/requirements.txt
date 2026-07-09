@@ -1,0 +1,10 @@
+duckdb
+duckdb-engine
+pandas
+pyarrow
+jupyterlab
+ipykernel
+matplotlib
+apache-superset
+rich
+cachetools
